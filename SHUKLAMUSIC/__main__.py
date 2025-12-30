@@ -1,18 +1,13 @@
 # -----------------------------------------------
 # 🔸 StrangerMusic Project
 # 🔹 Developed & Maintained by: Shashank Shukla (https://github.com/itzshukla)
-# 📅 Copyright © 2022 – All Rights Reserved
-#
-# 📖 License:
-# This source code is open for educational and non-commercial use ONLY.
-# You are required to retain this credit in all copies or substantial portions of this file.
-# Commercial use, redistribution, or removal of this notice is strictly prohibited
-# without prior written permission from the author.
-#
-# ❤️ Made with dedication and love by ItzShukla
 # -----------------------------------------------
 import asyncio
 import importlib
+import os
+from threading import Thread
+from flask import Flask  # Flask import kiya
+
 from pyrogram import idle
 from pytgcalls.exceptions import NoActiveGroupCall
 import config
@@ -22,7 +17,30 @@ from SHUKLAMUSIC.misc import sudo
 from SHUKLAMUSIC.plugins import ALL_MODULES
 from SHUKLAMUSIC.utils.database import get_banned_users, get_gbanned
 
+# --- FLASK SERVER SETUP (UPTIME KE LIYE) ---
+web_app = Flask(__name__)
+
+@web_app.route('/')
+def home():
+    return "Stranger Music Bot Is Alive & Running! 🎵"
+
+def run_web():
+    # Render ka PORT uthayega ya default 8080 use karega
+    port = int(os.environ.get("PORT", 8080))
+    web_app.run(host="0.0.0.0", port=port)
+
+def start_web_server():
+    # Alag thread me server start karo taaki bot block na ho
+    t = Thread(target=run_web)
+    t.daemon = True
+    t.start()
+# -------------------------------------------
+
 async def init():
+    # Sabse pehle Web Server start karo
+    start_web_server()
+    LOGGER("SHUKLAMUSIC").info("Fʟᴀsᴋ Sᴇʀᴠᴇʀ Sᴛᴀʀᴛᴇᴅ Fᴏʀ Uᴘᴛɪᴍᴇ ⚡")
+
     if (
         not config.STRING1
         and not config.STRING2
@@ -52,7 +70,7 @@ async def init():
         await SHUKLA.stream_call("https://te.legra.ph/file/29f784eb49d230ab62e9e.mp4")
     except NoActiveGroupCall:
         LOGGER("SHUKLAMUSIC").error(
-            "𝗣𝗹𝗭 𝗦𝗧𝗔𝗥𝗧 𝗬𝗢𝗨𝗥 𝗟𝗢𝗚 𝗚𝗥𝗢𝗨𝗣 𝗩𝗢𝗜𝗖𝗘𝗖𝗛𝗔𝗧\𝗖𝗛𝗔𝗡𝗡𝗘𝗟\n\n𝗦𝗧𝗥𝗔𝗡𝗚𝗘𝗥 𝗕𝗢𝗧 𝗦𝗧𝗢𝗣........"
+            "𝗣𝗹𝗭 𝗦𝗧𝗔𝗥𝗧 𝗬𝗢𝗨𝗥 𝗟𝗢𝗚 𝗚𝗥𝗢𝗨𝗣 𝗩𝗢𝗜𝗖𝗘𝗖𝗛𝗔𝗧\n𝗦𝗧𝗥𝗔𝗡𝗚𝗘𝗥 𝗕𝗢𝗧 𝗦𝗧𝗢𝗣........"
         )
         exit()
     except:
@@ -69,3 +87,4 @@ async def init():
 
 if __name__ == "__main__":
     asyncio.get_event_loop().run_until_complete(init())
+    
